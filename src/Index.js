@@ -195,4 +195,4 @@ export class Mission_Clocks {
       await this.state.storage.setAlarm(Date.now() + 1000);
     }
   }
-        }
+        };
