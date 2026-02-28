@@ -1,0 +1,43 @@
+name = "mission-clocks-worker"
+main = "src/index.js"
+compatibility_date = "2024-12-01"
+
+# =========================
+# Durable Object Binding
+# =========================
+
+[[durable_objects.bindings]]
+name = "MISSION_CLOCKS"
+class_name = "Mission_Clocks"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Mission_Clocks"]
+
+# =========================
+# Service Bindings
+# =========================
+
+[[services]]
+binding = "mission-control-api"
+service = "mission-control-api"
+
+[[services]]
+binding = "mission-comms"
+service = "mission-comms"
+
+# =========================
+# D1 Schema Binding
+# =========================
+
+[[d1_databases]]
+binding = "schema"
+database_name = "15d-primary-db"
+
+# =========================
+# Environment Variables
+# =========================
+
+[vars]
+ENVIRONMENT = "production"
+SYSTEM_NAME = "15D_WINGS_MISSION_CLOCKS"
