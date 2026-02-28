@@ -63,7 +63,6 @@ export class Mission_Clocks {
       });
     }
 
-    // Sort triggers by time ascending
     triggers.sort((a, b) => new Date(a.time) - new Date(b.time));
 
     await this.state.storage.put("missionId", missionId);
@@ -78,7 +77,6 @@ export class Mission_Clocks {
     });
   }
 
-  // ====== REGISTER DOCUMENT EXPIRY AFTER INIT ======
   async registerDocument(request) {
     const body = await request.json();
     const { documentId, expiry } = body;
@@ -102,7 +100,6 @@ export class Mission_Clocks {
     });
   }
 
-  // ====== CANCEL ALL TIMERS ======
   async cancelAll() {
     await this.state.storage.delete("triggers");
     await this.state.storage.deleteAll();
@@ -111,14 +108,11 @@ export class Mission_Clocks {
     });
   }
 
-  // ====== ALARM HANDLER ======
   async alarm() {
     const missionId = await this.state.storage.get("missionId");
     let triggers = (await this.state.storage.get("triggers")) || [];
 
-    if (!triggers.length) {
-      return;
-    }
+    if (!triggers.length) return;
 
     const now = Date.now();
 
@@ -131,12 +125,10 @@ export class Mission_Clocks {
       return;
     }
 
-    // Execute all due triggers
     for (const trigger of dueTriggers) {
       await this.emitTrigger(missionId, trigger);
     }
 
-    // Remove executed triggers
     triggers = triggers.filter(
       (t) => new Date(t.time).getTime() > now
     );
@@ -146,14 +138,11 @@ export class Mission_Clocks {
     await this.scheduleNextAlarm();
   }
 
-  // ====== EMIT EVENT TO GOVERNANCE ======
   async emitTrigger(missionId, trigger) {
     try {
       await fetch(this.env["mission-control-api"], {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           missionId,
           eventType: trigger.type,
@@ -161,12 +150,9 @@ export class Mission_Clocks {
         })
       });
 
-      // Optional notification dispatch
       await fetch(this.env["mission-comms"], {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           missionId,
           notificationType: trigger.type
@@ -178,13 +164,9 @@ export class Mission_Clocks {
     }
   }
 
-  // ====== SCHEDULE NEXT ALARM ======
   async scheduleNextAlarm() {
     const triggers = (await this.state.storage.get("triggers")) || [];
-
-    if (!triggers.length) {
-      return;
-    }
+    if (!triggers.length) return;
 
     const nextTrigger = triggers[0];
     const nextTime = new Date(nextTrigger.time).getTime();
@@ -195,4 +177,14 @@ export class Mission_Clocks {
       await this.state.storage.setAlarm(Date.now() + 1000);
     }
   }
-        };
+}
+
+/*
+  ✅ THIS is what makes it a Module Worker.
+  Without this, Wrangler falls back to service-worker mode.
+*/
+export default {
+  async fetch(request, env, ctx) {
+    return new Response("Mission Clocks Worker Running");
+  }
+};
