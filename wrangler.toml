@@ -12,7 +12,7 @@ class_name = "Mission_Clocks"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["Mission_Clocks"]
+new_sqlite_classes = ["Mission_Clocks"]
 
 # =========================
 # Service Bindings
