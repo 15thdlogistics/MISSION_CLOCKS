@@ -32,7 +32,7 @@ service = "mission-comms"
 
 [[d1_databases]]
 binding = "schema"
-database_name = "15d-primary-db"
+database_name = "15dwings-primary-db"
 
 # =========================
 # Environment Variables
